@@ -95,7 +95,7 @@ func walkWildMat(wm *nntpserver.WildMat, d chan <- string){
 	close (d)
 }
 
-// Gets a list of prefixes, that represents a superset of all
+// GetPrefixes gets a list of prefixes, that represents a superset of all
 // newsgroups, matched by the given WildMat.
 func GetPrefixes(wm *nntpserver.WildMat) []string {
 	d := make(chan string,8)
