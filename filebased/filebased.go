@@ -1,6 +1,6 @@
 
 /*
- A (slapdash coded) file based backend.
+ A (slapdash coded) file based backend. DEPRECATED!!! (Do not use)
  */
 package filebased
 
