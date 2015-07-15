@@ -16,10 +16,10 @@ func (d DayID) Date() (year int, month int, day int) {
 type DayProvider func() DayID
 
 type Group struct{
-	Name string
-	Desc string
-	Low int64
-	High int64
+	Name  string
+	Desc  string
+	Low   int64
+	High  int64
 	Count int64
 	State byte
 }
