@@ -42,7 +42,7 @@ func Open(opts *groupdb.Options) (groupdb.GroupDB,error) {
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		g.grass,h2,e = lldb.CreateBTree(g.alloc,bytes.Compare)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
-		g.tmlog,h3,e = lldb.CreateBTree(g.alloc,bytes.Compare)
+		g.tmlog,h3,e = lldb.CreateBTree(g.alloc,reverseComp)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		v,e := lldb.EncodeScalars(h1,h2,h3)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
