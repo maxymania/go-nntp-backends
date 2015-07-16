@@ -117,9 +117,9 @@ func (i *innerGroupDB) erase(upto groupdb.DayID) {
 	var ga groupday
 	var gd groupdescr
 	var in int64
-	buf := bufs.GCache.Get(16)
+	buf := bufs.GCache.Get(20)
 	defer bufs.GCache.Put(buf)
-	pf := r2b(upto)
+	pf := r2b(groupday{upto,-1})
 	enum,_,_ := i.tmlog.Seek(pf)
 	if enum==nil { return }
 	for {
@@ -128,10 +128,11 @@ func (i *innerGroupDB) erase(upto groupdb.DayID) {
 		if ga.DayID!=upto { return }
 		if !b2r(v,&in) { continue }
 		vv,_ := i.alloc.Get(buf,ga.Grp)
-		if len(vv)!=16 { continue }
+		if len(vv)!=20 { continue }
 		if !b2r(vv,&gd) { continue }
+		if gd.Begin >= in { continue }
 		gd.Begin = in
-		i.alloc.Realloc(ga.Grp,vv)
+		i.alloc.Realloc(ga.Grp,r2b(gd))
 	}
 }
 
