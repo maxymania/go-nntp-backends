@@ -51,14 +51,14 @@ type innerGroupDB struct{
 
 func (i *innerGroupDB) gget(grp, num int64) string {
 	var gd groupdescr
-	buf := bufs.GCache.Get(16)
+	buf := bufs.GCache.Get(20)
 	v,_ := i.alloc.Get(buf,grp)
-	if len(v)!=16 { return "" }
+	if len(v)!=20 { return "" }
 	if !b2r(v,&gd) { return "" }
 	bufs.GCache.Put(buf)
 	if gd.Begin>num { return "" }
 	if gd.End<=num { return "" }
-	v,_ = i.grass.Get(nil, r2b(groupnum{grp,gd.End}) )
+	v,_ = i.grass.Get(nil, r2b(groupnum{grp,num}) )
 	return string(v)
 }
 func (i *innerGroupDB) gassign(grp int64, id string) error {
