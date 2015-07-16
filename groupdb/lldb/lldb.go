@@ -7,6 +7,21 @@ type groupDB struct{
 	innerGroupDB
 }
 
+func (g *groupDB) AddGroups(src <- chan groupdb.GroupMeta) {
+	g.mutex.Lock(); defer g.mutex.Unlock()
+	e := g.filer.BeginUpdate()
+	if e!=nil { return }
+	for grpo := range src {
+		v,_ := g.group.Get(nil,[]byte(grpo.Name))
+		if len(v)>0 { continue }
+		if g.add(grpo.Name,grpo.Desc,grpo.State)!=nil {
+			g.filer.Rollback()
+			for _ = range src { }
+			return
+		}
+	}
+	g.filer.EndUpdate()
+}
 func (g *groupDB) AddGroup(group, descr string,state byte) {
 	g.mutex.Lock(); defer g.mutex.Unlock()
 	e := g.filer.BeginUpdate()

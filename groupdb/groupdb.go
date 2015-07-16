@@ -24,7 +24,14 @@ type Group struct{
 	State byte
 }
 
+type GroupMeta struct{
+	Name  string
+	Desc  string
+	State byte
+}
+
 type GroupDB interface{
+	AddGroups(src <- chan GroupMeta)
 	AddGroup(group, descr string,state byte)
 	Groups(prefix string,ptr *Group,cb func())
 	Group(group string, ptr *Group) bool
