@@ -28,7 +28,19 @@ func (g *groupDB) Groups(prefix string,ptr *groupdb.Group,cb func()) {
 		if len(k)==0 { break }
 		if !bytes.HasPrefix(k,pfx) { break }
 		if len(v)==0 { continue }
-		if getGroup(v,ptr,&idx) { cb() }
+		if getGroup(v,ptr,&idx) {
+			gd := g.groupdescr(idx)
+			if gd.Begin<gd.End {
+				ptr.Low = gd.Begin
+				ptr.High = gd.End-1
+				ptr.Count = gd.End-gd.Begin
+			} else {
+				ptr.Low = 0
+				ptr.High = 0
+				ptr.Count = 0
+			}
+			cb()
+		}
 	}
 }
 func (g *groupDB) Group(group string, ptr *groupdb.Group) bool {
@@ -36,7 +48,20 @@ func (g *groupDB) Group(group string, ptr *groupdb.Group) bool {
 	g.mutex.RLock(); defer g.mutex.RUnlock()
 	v,_ := g.group.Get(nil,[]byte(group))
 	if len(v)==0 { return false }
-	return getGroup(v,ptr,&idx)
+	if getGroup(v,ptr,&idx) {
+		gd := g.groupdescr(idx)
+		if gd.Begin<gd.End {
+			ptr.Low = gd.Begin
+			ptr.High = gd.End-1
+			ptr.Count = gd.End-gd.Begin
+		} else {
+			ptr.Low = 0
+			ptr.High = 0
+			ptr.Count = 0
+		}
+		return true
+	}
+	return false
 }
 func (g *groupDB) Numberate(groups []string, id string) {
 	var grpobj groupdb.Group

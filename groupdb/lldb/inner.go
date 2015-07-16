@@ -30,7 +30,8 @@ func getGroup(ge []byte,ptr *groupdb.Group, i *int64) bool {
 	if !ok { return false }
 	ptr.Desc,ok = s[1].(string)
 	if !ok { return false }
-	ptr.State,ok = s[2].(uint8)
+	state,ok := s[2].(uint64)
+	ptr.State = byte(state)
 	if !ok { return false }
 	*i,ok = s[3].(int64)
 	if !ok { return false }
@@ -62,9 +63,9 @@ func (i *innerGroupDB) gget(grp, num int64) string {
 }
 func (i *innerGroupDB) gassign(grp int64, id string) error {
 	var gd groupdescr
-	buf := bufs.GCache.Get(16)
+	buf := bufs.GCache.Get(20)
 	v,_ := i.alloc.Get(buf,grp)
-	if len(v)!=16 { return nil }
+	if len(v)!=20 { return nil }
 	b2r(v,&gd)
 	bufs.GCache.Put(buf)
 
@@ -95,12 +96,20 @@ func (i *innerGroupDB) gassign(grp int64, id string) error {
 	gd.End++
 	return i.alloc.Realloc(grp,r2b(gd))
 }
+func (i *innerGroupDB) groupdescr(grp int64) (gd groupdescr) {
+	buf := bufs.GCache.Get(20)
+	v,_ := i.alloc.Get(buf,grp)
+	if len(v)!=20 { return }
+	b2r(v,&gd)
+	bufs.GCache.Put(buf)
+	return
+}
 func (i *innerGroupDB) add(group, descr string, state byte) error{
 	R,_ := i.group.Get(nil,[]byte(group))
 	if R!=nil { return nil }
 	h,e := i.alloc.Alloc(r2b(groupdescr{1,1,i.dprov()}))
 	if e!=nil { return e }
-	v,e := lldb.EncodeScalars(group,descr,state,h)
+	v,e := lldb.EncodeScalars(group,descr,uint64(state),h)
 	if e!=nil { return e }
 	return i.group.Set([]byte(group),v)
 }

@@ -15,7 +15,7 @@ func openWAL(fn string) (lldb.Filer,io.Closer,bool,error) {
 		f,e = os.OpenFile(fn,os.O_RDWR|os.O_CREATE,0660)
 		if e!=nil { return nil,nil,false,e }
 	}
-	fl,e := os.OpenFile(fn,os.O_RDWR|os.O_CREATE,0660)
+	fl,e := os.OpenFile(fn+".wal",os.O_RDWR|os.O_CREATE,0660)
 	if e!=nil { f.Close(); return nil,nil,false,e }
 	filer,e := lldb.NewACIDFiler(lldb.NewSimpleFileFiler(f),fl)
 	if e!=nil { f.Close(); fl.Close(); return nil,nil,false,e }
