@@ -34,7 +34,6 @@ func Open(opts *groupdb.Options) (groupdb.GroupDB,error) {
 	if e!=nil { f.Close(); c.Close(); return nil,e }
 	if first {
 		g.filer.BeginUpdate()
-		defer g.filer.EndUpdate()
 		i,e := g.alloc.Alloc([]byte("......"))
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		if i!=1 { f.Close(); c.Close(); return nil,errors.New("corrupted") }
@@ -48,6 +47,7 @@ func Open(opts *groupdb.Options) (groupdb.GroupDB,error) {
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		e = g.alloc.Realloc(1,v)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
+		g.filer.EndUpdate()
 	} else {
 		v,e := g.alloc.Get(nil,1)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
