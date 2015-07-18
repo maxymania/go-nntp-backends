@@ -57,7 +57,7 @@ func Open(opts *groupdb.Options) (groupdb.GroupDB,error) {
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		g.grass,e = lldb.OpenBTree(g.alloc,bytes.Compare,s[1].(int64))
 		if e!=nil { f.Close(); c.Close(); return nil,e }
-		g.tmlog,e = lldb.OpenBTree(g.alloc,bytes.Compare,s[2].(int64))
+		g.tmlog,e = lldb.OpenBTree(g.alloc,reverseComp,s[2].(int64))
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 	}
 	return g,nil
