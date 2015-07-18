@@ -40,7 +40,7 @@ func Open(opts *dayfiledb.Options) (dayfiledb.DayfileDB,error) {
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		g.revin,h2,e = lldb.CreateBTree(g.alloc,reverseComp)
 		if e!=nil { f.Close(); c.Close(); return nil,e }
-		h3,e = g.alloc.Alloc([]byte{0,0,0,0})
+		h3,e = g.alloc.Alloc([]byte{0})
 		g.lastdf = h3
 		if e!=nil { f.Close(); c.Close(); return nil,e }
 		v,e := lldb.EncodeScalars(h1,h2,h3)
