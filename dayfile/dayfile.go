@@ -107,9 +107,8 @@ func (s *StorageFilePool) createDayfile(db groupdb.DayID, create bool) *StorageF
 }
 func (s *StorageFilePool) create(db groupdb.DayID, create bool) *StorageFile {
 	y,m,d := db.Date()
-	sr := s.basepath+fmt.Sprintf("df%04x%02x%02x.df",y,m,d)
+	sr := s.basepath+fmt.Sprintf("%04d-%02d-%02d.df",y,m,d)
 	sf := new(StorageFile)
-	var err error
 	fm := os.O_RDWR
 	if create { fm |= os.O_CREATE }
 	var e error
