@@ -1,6 +1,7 @@
 package dfbackend
 
 import (
+	"github.com/maxymania/go-nntp-backends/prefixing"
 	"github.com/maxymania/go-nntp-backends/articlestore"
 	"github.com/maxymania/go-nntp-backends/dayfile"
 	"github.com/maxymania/go-nntp-backends/groupdb"
@@ -35,17 +36,26 @@ func toNGroup(gdb groupdb.Group) *nntp.Group{
 	}
 }
 
-func (b *backend) ListGroups() (<-chan *nntp.Group, error) {
+func (b *backend) listGroups(prefixes []string) (<-chan *nntp.Group, error) {
 	cng := make(chan *nntp.Group,1024)
 	go func(){
 		defer func(){close(cng)}()
 		var gdb groupdb.Group
-		b.gdb.Groups("",&gdb,func(){
-			cng <- toNGroup(gdb)
-		})
+		for _,s := range prefixes {
+			b.gdb.Groups(s,&gdb,func(){
+				cng <- toNGroup(gdb)
+			})
+		}
 	}()
 	return cng,nil
 }
+func (b *backend) ListGroups() (<-chan *nntp.Group, error) {
+	return b.listGroups([]string{""})
+}
+func (b *backend) ListGroupsWildMat(pattern *nntpserver.WildMat) (<-chan *nntp.Group, error) {
+	return b.listGroups(prefixing.GetPrefixes(pattern))
+}
+
 
 func (b *backend) GetGroup(name string) (*nntp.Group, error) {
 	var gdb groupdb.Group
